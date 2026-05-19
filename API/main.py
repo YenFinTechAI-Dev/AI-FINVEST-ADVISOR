@@ -8,10 +8,9 @@ import uvicorn
 
 app = FastAPI(title="AI-FINVEST-ADVISOR")
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -21,15 +20,13 @@ app.add_middleware(
 class Transaction(BaseModel):
     amount: int
     category: str
-    type: str 
+    type: str
     note: str = ""
-
 
 
 DB_NAME = "finance.db"
 
 def init_db():
-    """Khởi tạo bảng transactions nếu chưa tồn tại"""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
@@ -45,24 +42,20 @@ def init_db():
     conn.commit()
     conn.close()
 
-#
 init_db()
-
 
 
 @app.get("/")
 def home():
     return {"message": "API Running"}
 
+
 @app.post("/api/transactions")
 async def add_transaction(item: Transaction):
-    """Lưu một giao dịch mới vào Database"""
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
-        
         clean_type = "Chi" if "Chi" in item.type else "Thu"
-        
         cursor.execute(
             "INSERT INTO transactions (amount, category, type, note) VALUES (?, ?, ?, ?)",
             (item.amount, item.category, clean_type, item.note)
@@ -73,18 +66,38 @@ async def add_transaction(item: Transaction):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ✅ Thêm endpoint DELETE
+@app.delete("/api/transactions/{transaction_id}")
+async def delete_transaction(transaction_id: int):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM transactions WHERE id = ?", (transaction_id,))
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            raise HTTPException(status_code=404, detail="Không tìm thấy giao dịch")
+        cursor.execute("DELETE FROM transactions WHERE id = ?", (transaction_id,))
+        conn.commit()
+        conn.close()
+        return {"status": "success", "message": f"Đã xóa giao dịch #{transaction_id}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/dashboard")
 async def get_dashboard_data():
-    """Tính toán và trả về dữ liệu cho Dashboard & Biểu đồ"""
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
 
-  
         cursor.execute("""
-            SELECT category, SUM(amount) 
-            FROM transactions 
-            WHERE type = 'Chi' 
+            SELECT category, SUM(amount)
+            FROM transactions
+            WHERE type = 'Chi'
             GROUP BY category
         """)
         chart_rows = cursor.fetchall()
@@ -93,20 +106,30 @@ async def get_dashboard_data():
             "values": [row[1] for row in chart_rows]
         }
 
-
         cursor.execute("SELECT type, SUM(amount) FROM transactions GROUP BY type")
         summary_rows = dict(cursor.fetchall())
-        
         summary = {
             "total_income": summary_rows.get("Thu", 0),
             "total_expense": summary_rows.get("Chi", 0)
         }
 
-
-        cursor.execute("SELECT amount, category, type, note, created_at FROM transactions ORDER BY id DESC LIMIT 5")
+        # ✅ Thêm id vào history để nút xóa hoạt động
+        cursor.execute("""
+            SELECT id, amount, category, type, note, created_at
+            FROM transactions
+            ORDER BY id DESC
+            LIMIT 20
+        """)
         history_rows = cursor.fetchall()
         history = [
-            {"amount": r[0], "category": r[1], "type": r[2], "note": r[3], "date": r[4]} 
+            {
+                "id":       r[0],
+                "amount":   r[1],
+                "category": r[2],
+                "type":     r[3],
+                "note":     r[4],
+                "date":     r[5]
+            }
             for r in history_rows
         ]
 
@@ -118,7 +141,6 @@ async def get_dashboard_data():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 if __name__ == "__main__":

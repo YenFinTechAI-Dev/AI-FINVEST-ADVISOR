@@ -21,7 +21,7 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-/* ── Chart — Phân bổ danh mục theo PDF ── */
+/* ── Chart ── */
 function renderChart(labels, values) {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     if (myChart) myChart.destroy();
@@ -90,6 +90,34 @@ async function loadDashboard() {
     }
 }
 
+/* ── Xóa giao dịch ── */
+async function deleteTransaction(id) {
+    console.log("🗑️ Xóa id:", id);
+    const el = document.getElementById(`tx-${id}`);
+    try {
+        if (el) {
+            el.style.transition = 'opacity 0.25s, transform 0.25s';
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(20px)';
+        }
+        const res = await fetch(`${API_URL}/transactions/${id}`, { method: 'DELETE' });
+        console.log("📡 Status:", res.status);
+        const json = await res.json().catch(() => ({}));
+        console.log("📦 Body:", json);
+        if (!res.ok) {
+            alert(`Lỗi xóa: ${json.detail || res.status}`);
+            if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
+            return;
+        }
+        setTimeout(async () => { await loadDashboard(); }, 260);
+    } catch (err) {
+        console.error("❌ Lỗi:", err.message);
+        alert("Lỗi kết nối: " + err.message);
+        if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
+        await loadDashboard();
+    }
+}
+
 function renderHistory(history) {
     const el = document.getElementById('historyList');
 
@@ -110,43 +138,28 @@ function renderHistory(history) {
     };
 
     el.innerHTML = history.map(tx => {
-
-        const isBuy = tx.type === 'Mua vào';
-        const cls = isBuy ? 'thu' : 'chi';
-
-        const sign = isBuy ? '+' : '-';
+        // Thu = Mua vào (bỏ tiền ra), Chi = Bán ra (thu tiền về)
+        const isBuy = tx.type === 'Thu';
+        const cls = isBuy ? 'chi' : 'thu';
+        const sign = isBuy ? '-' : '+';
         const label = isBuy ? 'Mua vào' : 'Bán ra';
-
-        const icon = catIcons[tx.category] || '📌';
-
-        const date = tx.date
-            ? new Date(tx.date).toLocaleDateString('vi-VN')
-            : '';
+        const icon = catIcons[tx.category] || '📊';
+        const date = tx.date ? new Date(tx.date).toLocaleDateString('vi-VN') : '';
 
         return `
-        <div class="history-item fade-in">
-            
-            <div class="history-icon-wrap ${cls}">
-                ${icon}
-            </div>
-
+        <div class="history-item fade-in" id="tx-${tx.id}">
+            <div class="history-icon-wrap ${cls}">${icon}</div>
             <div class="history-info">
                 <div class="history-cat">
                     ${tx.category}
-                    <span style="font-size:11px; opacity:0.6;">
-                        ${label}
-                    </span>
+                    <span style="font-size:11px; opacity:0.6;">${label}</span>
                 </div>
-
-                <div class="history-note">
-                    ${tx.note || date}
-                </div>
+                <div class="history-note">${tx.note || date}</div>
             </div>
-
-            <div class="history-amount ${cls}">
-                ${sign}${Number(tx.amount).toLocaleString('vi-VN')}đ
-            </div>
-
+            <div class="history-amount ${cls}">${sign}${Number(tx.amount).toLocaleString('vi-VN')}đ</div>
+            <button class="btn-delete-tx" onclick="deleteTransaction(${tx.id})" title="Xóa">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
         </div>`;
     }).join('');
 }
@@ -183,7 +196,7 @@ async function processAI() {
     if (dashData) {
         const { summary, chart, history } = dashData;
         const topCats = (chart && chart.labels || []).map((l, i) => `${l}: ${(chart.values[i] || 0).toLocaleString('vi-VN')}đ`).join(', ');
-        const recentTx = (history || []).slice(0, 5).map(t => `${t.type === 'Chi' ? 'Mua vào' : 'Bán ra'} ${t.category} ${t.amount.toLocaleString('vi-VN')}đ`).join('; ');
+        const recentTx = (history || []).slice(0, 5).map(t => `${t.type === 'Thu' ? 'Mua vào' : 'Bán ra'} ${t.category} ${t.amount.toLocaleString('vi-VN')}đ`).join('; ');
         context = `Danh mục đầu tư AI-FINVEST: Tổng giá trị 127.5M đ | Lợi nhuận YTD: +18.4% | Risk Score: 6.2/10 (Trung bình cao). Phân bổ tối ưu Markowitz: Cổ phiếu 40%, ETF 25%, Trái phiếu 20%, Tiền mặt 10%, Khác 5%. Mua vào: ${(summary.total_income || 0).toLocaleString('vi-VN')}đ | Bán ra: ${(summary.total_expense || 0).toLocaleString('vi-VN')}đ. Chi tiết: ${topCats || 'Chưa có'}. Giao dịch gần đây: ${recentTx || 'Chưa có'}.`;
     }
 
@@ -203,8 +216,8 @@ async function processAI() {
                     body: JSON.stringify(result)
                 });
                 await loadDashboard();
-                const color = result.type === 'Chi' ? 'var(--red)' : 'var(--green)';
-                const label = result.type === 'Chi' ? 'Mua vào' : 'Bán ra';
+                const color = result.type === 'Thu' ? 'var(--red)' : 'var(--green)';
+                const label = result.type === 'Thu' ? 'Mua vào' : 'Bán ra';
                 status.innerHTML = `<div class="ai-status-box success">
                     <div class="ai-result-row">
                         <div>
