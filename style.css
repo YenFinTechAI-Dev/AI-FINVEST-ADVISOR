@@ -1189,3 +1189,201 @@
          opacity: 1;
      }
  }
+/* =========================
+   RESPONSIVE MOBILE
+========================= */
+
+@media (max-width: 992px) {
+
+    body {
+        overflow: auto;
+    }
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 14px;
+    }
+
+    .sidebar-bottom {
+        margin-top: 20px;
+    }
+
+    .main-content {
+        padding: 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ticker-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-input-row {
+        flex-direction: column;
+    }
+
+    .ai-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .portfolio-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-cards-row {
+        grid-template-columns: 1fr;
+    }
+
+    .alert-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header-center {
+        display: none;
+    }
+
+    header {
+        padding: 0 16px;
+    }
+
+    .header-right {
+        gap: 8px;
+    }
+
+    .header-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+
+/* =========================
+   MOBILE PHONE
+========================= */
+
+@media (max-width: 600px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    header {
+        height: auto;
+        padding: 14px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .logo-text {
+        font-size: 14px;
+    }
+
+    .page-title {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .page-subtitle {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ticker-row {
+        grid-template-columns: 1fr;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+
+    .chart-wrap {
+        height: 220px;
+    }
+
+    .history-item {
+        gap: 10px;
+    }
+
+    .history-amount {
+        font-size: 12px;
+    }
+
+    .allocation-item {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .alloc-bar-wrap {
+        width: 100%;
+        margin-top: 6px;
+    }
+
+    .ai-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ai-powered-badge {
+        width: 100%;
+        text-align: center;
+    }
+
+    .risk-widget {
+        margin-top: 10px;
+    }
+
+    .ticker-card {
+        padding: 12px;
+    }
+
+    .ticker-price {
+        font-size: 14px;
+    }
+
+    .panel-title {
+        font-size: 13px;
+    }
+
+    .main-content {
+        padding: 12px;
+    }
+}
