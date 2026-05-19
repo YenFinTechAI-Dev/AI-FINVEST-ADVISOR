@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-FINVEST ADVISOR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon">A</div>
+            <div>
+                <div class="logo-text">AI-FINVEST <span>ADVISOR</span></div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="header-badge"><i class="fa-solid fa-circle"
+                    style="font-size:7px; color:var(--green); margin-right:5px;"></i>From Data To Decision</div>
+        </div>
+        <div class="header-right">
+            <button class="header-btn">Đăng nhập</button>
+            <button class="header-btn primary"><i class="fa-solid fa-rocket"></i> Bắt đầu</button>
+        </div>
+    </header>
+
+    <div class="layout">
+
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-label">Menu chính</div>
+                <div class="nav-item active" onclick="setActive(this)">
+                    <i class="fa-solid fa-chart-pie"></i> Tổng quan
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <i class="fa-solid fa-layer-group"></i> Danh mục
+                    <span class="badge">AI</span>
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <i class="fa-solid fa-chart-line"></i> Thị trường
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Giao dịch
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <i class="fa-solid fa-bell"></i> Cảnh báo
+                </div>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Tiện ích</div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <i class="fa-solid fa-file-chart-column"></i> Báo cáo
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <i class="fa-solid fa-gear"></i> Cài đặt
+                </div>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="risk-widget">
+                    <div class="risk-widget-title">Risk Score cá nhân hóa</div>
+                    <div class="risk-score-display">
+                        <div class="risk-number" id="riskScore">6.2</div>
+                        <div>
+                            <div class="risk-label" style="font-weight:700; color: var(--gold);">Trung bình cao</div>
+                            <div class="risk-label">/ 10</div>
+                        </div>
+                    </div>
+                    <div class="risk-bar-track">
+                        <div class="risk-bar-fill" id="riskBar"></div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text3); margin-top:8px;">Phù hợp khẩu vị & mục tiêu đầu tư
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+
+        <main class="main-content">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Dashboard Đầu Tư AI</div>
+                    <div class="page-subtitle">Chuyên gia tài chính ảo — AI-Powered Investing For Everyone · 24/7</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="live-badge">
+                        <div class="live-dot"></div>
+                        Dữ liệu thời gian thực
+                    </div>
+                    <div style="font-size:11px; color:var(--text3);">Cập nhật: <span id="updateTime">--:--:--</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="ticker-row">
+                <div class="ticker-card">
+                    <div class="ticker-symbol">VN-INDEX</div>
+                    <div class="ticker-price">1,289.45</div>
+                    <div class="ticker-change up"><i class="fa-solid fa-arrow-trend-up"></i> +0.85% hôm nay</div>
+                </div>
+                <div class="ticker-card">
+                    <div class="ticker-symbol">HNX-INDEX</div>
+                    <div class="ticker-price">235.12</div>
+                    <div class="ticker-change up"><i class="fa-solid fa-arrow-trend-up"></i> +0.71%</div>
+                </div>
+                <div class="ticker-card">
+                    <div class="ticker-symbol">FPT</div>
+                    <div class="ticker-price">148,200đ</div>
+                    <div class="ticker-change up"><i class="fa-solid fa-arrow-trend-up"></i> +2.15%</div>
+                </div>
+                <div class="ticker-card">
+                    <div class="ticker-symbol">HPG</div>
+                    <div class="ticker-price">29,500đ</div>
+                    <div class="ticker-change down"><i class="fa-solid fa-arrow-trend-down"></i> -0.34%</div>
+                </div>
+            </div>
+
+
+            <div class="stats-row">
+                <div class="stat-card portfolio-main">
+                    <div class="stat-label">Tổng Giá Trị Danh Mục</div>
+                    <div class="stat-value cyan" id="totalPortfolio">127,500,000đ</div>
+                    <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +19.8M đ so với đầu năm</div>
+                    <i class="fa-solid fa-chart-line stat-icon"></i>
+                </div>
+                <div class="stat-card risk-card">
+                    <div class="stat-label">Risk Score</div>
+                    <div class="stat-value gold">6.2 <span style="font-size:14px; color:var(--text3);">/ 10</span></div>
+                    <div class="stat-change" style="color:var(--gold); font-weight:700;">Trung bình cao</div>
+                    <i class="fa-solid fa-shield-halved stat-icon"></i>
+                </div>
+                <div class="stat-card ytd-card">
+                    <div class="stat-label">Lợi Nhuận YTD</div>
+                    <div class="stat-value green" id="ytdReturn">+18.4%</div>
+                    <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> Từ đầu năm</div>
+                    <i class="fa-solid fa-arrow-trend-up stat-icon"></i>
+                </div>
+                <div class="stat-card balance">
+                    <div class="stat-label">Giao Dịch Tháng Này</div>
+                    <div class="stat-value" id="totalTx" style="color:var(--text);">0</div>
+                    <div class="stat-change" style="color:var(--text2);">Số lệnh đã thực hiện</div>
+                    <i class="fa-solid fa-receipt stat-icon"></i>
+                </div>
+            </div>
+
+            <div class="ai-advisor-box">
+                <div class="ai-header">
+                    <div class="ai-icon"><i class="fa-solid fa-robot"></i></div>
+                    <div style="flex:1;">
+                        <div class="ai-title">AI-FINVEST Advisor · Chuyên gia tài chính ảo 24/7</div>
+                        <div class="ai-subtitle">Nhập giao dịch hoặc hỏi phân tích danh mục · Tối ưu hóa theo khẩu vị
+                            rủi ro của bạn</div>
+                    </div>
+                    <div class="ai-powered-badge">Powered by AI</div>
+                </div>
+                <div class="ai-input-row">
+                    <input type="text" class="ai-input" id="aiInput"
+                        placeholder="VD: 'Mua FPT 148200đ' hoặc 'Phân tích danh mục của tôi' hoặc 'Có nên tái cơ cấu không?'...">
+                    <button class="ai-btn" id="btnAI" onclick="processAI()">
+                        <i class="fa-solid fa-paper-plane"></i> Gửi AI
+                    </button>
+                </div>
+                <div id="aiStatus" style="display:none;"></div>
+            </div>
+
+
+            <div class="content-grid">
+
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="panel-title-icon icon-green"><i class="fa-solid fa-plus"></i></div>
+                            Thêm Giao Dịch Đầu Tư
+                        </div>
+                    </div>
+                    <form id="transactionForm">
+                        <div class="form-group">
+                            <label class="form-label">Số tiền (VNĐ)</label>
+                            <input type="number" id="amount" class="form-input" placeholder="VD: 5000000" required>
+                        </div>
+                        <div class="form-row form-group">
+                            <div>
+                                <label class="form-label">Loại lệnh</label>
+                                <select id="type" class="form-select">
+                                    <option value="Chi">Mua vào</option>
+                                    <option value="Thu">Bán ra</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Danh mục</label>
+                                <select id="category" class="form-select">
+                                    <option value="Cổ phiếu">Cổ phiếu</option>
+                                    <option value="ETF">ETF</option>
+                                    <option value="Trái phiếu">Trái phiếu</option>
+                                    <option value="Tiền mặt">Tiền mặt</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mã CK / Ghi chú</label>
+                            <textarea id="note" class="form-textarea"
+                                placeholder="VD: FPT, HPG, VN30 ETF..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-save" id="btnSave">
+                            <i class="fa-solid fa-floppy-disk"></i> LƯU GIAO DỊCH
+                        </button>
+                    </form>
+                </div>
+
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="panel-title-icon icon-cyan"><i class="fa-solid fa-chart-pie"></i></div>
+                            Phân Bổ Danh Mục
+                        </div>
+                        <div style="font-size:11px; color:var(--text3);">Markowitz Optimization</div>
+                    </div>
+                    <div class="summary-cards-row" style="margin-bottom:16px;">
+                        <div class="mini-card">
+                            <div class="mini-card-label">Mua Vào</div>
+                            <div class="mini-card-value" id="mc-income" style="color:var(--green);">0đ</div>
+                        </div>
+                        <div class="mini-card">
+                            <div class="mini-card-label">Bán Ra</div>
+                            <div class="mini-card-value" id="mc-expense" style="color:var(--red);">0đ</div>
+                        </div>
+                        <div class="mini-card">
+                            <div class="mini-card-label">Lợi Nhuận</div>
+                            <div class="mini-card-value" id="mc-balance" style="color:var(--cyan);">0đ</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="bottom-grid">
+
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="panel-title-icon icon-gold"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            Giao Dịch Gần Đây
+                        </div>
+                        <div style="font-size:11px; color:var(--text3);">Theo dõi & Tái cơ cấu 24/7</div>
+                    </div>
+                    <div id="historyList">
+                        <p style="color:var(--text3); text-align:center; padding:24px; font-size:14px;">Đang tải dữ
+                            liệu...</p>
+                    </div>
+                </div>
+
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="panel-title-icon icon-cyan"><i class="fa-solid fa-layer-group"></i></div>
+                            Danh Mục Đầu Tư
+                        </div>
+                    </div>
+
+                    <div class="portfolio-stats">
+                        <div class="pstat">
+                            <div class="pstat-label">Tổng giá trị</div>
+                            <div class="pstat-value" style="color:var(--cyan);">127.5M đ</div>
+                        </div>
+                        <div class="pstat">
+                            <div class="pstat-label">Lợi nhuận YTD</div>
+                            <div class="pstat-value" style="color:var(--green);">+18.4%</div>
+                        </div>
+                    </div>
+
+
+                    <ul class="allocation-list">
+                        <li class="allocation-item">
+                            <div class="alloc-dot" style="background:#00c6ff;"></div>
+                            <div class="alloc-name">Cổ phiếu</div>
+                            <div class="alloc-bar-wrap">
+                                <div class="alloc-bar" style="width:51%; background:#00c6ff;"></div>
+                            </div>
+                            <div class="alloc-pct">51M đ <span class="alloc-percent">40%</span></div>
+                        </li>
+                        <li class="allocation-item">
+                            <div class="alloc-dot" style="background:#00e5a0;"></div>
+                            <div class="alloc-name">ETF</div>
+                            <div class="alloc-bar-wrap">
+                                <div class="alloc-bar" style="width:25%; background:#00e5a0;"></div>
+                            </div>
+                            <div class="alloc-pct">32M đ <span class="alloc-percent">25%</span></div>
+                        </li>
+                        <li class="allocation-item">
+                            <div class="alloc-dot" style="background:#ffd166;"></div>
+                            <div class="alloc-name">Trái phiếu</div>
+                            <div class="alloc-bar-wrap">
+                                <div class="alloc-bar" style="width:20%; background:#ffd166;"></div>
+                            </div>
+                            <div class="alloc-pct">25.5M đ <span class="alloc-percent">20%</span></div>
+                        </li>
+                        <li class="allocation-item">
+                            <div class="alloc-dot" style="background:#ff4d6d;"></div>
+                            <div class="alloc-name">Tiền mặt</div>
+                            <div class="alloc-bar-wrap">
+                                <div class="alloc-bar" style="width:10%; background:#ff4d6d;"></div>
+                            </div>
+                            <div class="alloc-pct">12.8M đ <span class="alloc-percent">10%</span></div>
+                        </li>
+                        <li class="allocation-item">
+                            <div class="alloc-dot" style="background:#7c3aed;"></div>
+                            <div class="alloc-name">Khác</div>
+                            <div class="alloc-bar-wrap">
+                                <div class="alloc-bar" style="width:5%; background:#7c3aed;"></div>
+                            </div>
+                            <div class="alloc-pct">6.3M đ <span class="alloc-percent">5%</span></div>
+                        </li>
+                    </ul>
+
+
+                    <div class="ai-advisor-tip">
+                        <div class="ai-advisor-tip-title">
+                            <i class="fa-solid fa-robot"></i> AI Advisor gợi ý
+                            <span class="tip-badge">Cảnh báo & Tái cơ cấu</span>
+                        </div>
+                        <div class="ai-advisor-tip-body">FPT Q2 +24% — Đề xuất tăng tỷ trọng. Dựa trên phân tích xu
+                            hướng, định giá cổ đồng biến.</div>
+                    </div>
+
+
+                    <div class="alert-row">
+                        <div class="alert-item green-alert">
+                            <i class="fa-solid fa-bell"></i> Cảnh báo chốt lời
+                        </div>
+                        <div class="alert-item red-alert">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Cắt lỗ tự động
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

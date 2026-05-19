@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Finvest Advisor</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  </style>
+</head>
+
+<body>
+
+  <div class="loading-bar" id="loadingBar"></div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">📈</div>
+      <div class="logo-text">AI-<span>Finvest</span></div>
+    </div>
+    <div class="nav">
+      <button class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">🏠</span> Tổng quan
+      </button>
+      <button class="nav-item" onclick="showPage('portfolio')" id="nav-portfolio">
+        <span class="nav-icon">💼</span> Danh mục
+      </button>
+      <button class="nav-item" onclick="showPage('advisor')" id="nav-advisor">
+        <span class="nav-icon">🤖</span> AI Advisor
+      </button>
+      <button class="nav-item" onclick="showPage('assess')" id="nav-assess">
+        <span class="nav-icon">🛡️</span> Đánh giá rủi ro
+      </button>
+      <button class="nav-item" onclick="showPage('alerts')" id="nav-alerts">
+        <span class="nav-icon">🔔</span> Cảnh báo
+        <span
+          style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700">3</span>
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="avatar">NĐT</div>
+        <div class="user-info">
+          <div class="user-name">Nhà đầu tư</div>
+          <div class="user-plan">✦ Premium</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="main">
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Tổng quan danh mục</div>
+          <div class="page-sub">Cập nhật lúc 09:41:30 · 18/05/2026</div>
+        </div>
+        <div class="header-badge">
+          <div class="live-dot"></div>Thị trường đang mở
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card cyan">
+          <div class="stat-label">Tổng giá trị danh mục</div>
+          <div class="stat-value">1,268M</div>
+          <div class="stat-change up">▲ +18.62% từ đầu năm</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Lợi nhuận YTD</div>
+          <div class="stat-value">+198M</div>
+          <div class="stat-change up">▲ So với 1,070M đầu năm</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Risk Score</div>
+          <div class="stat-value">6.2<span style="font-size:14px;color:var(--text2)">/10</span></div>
+          <div class="stat-change" style="color:var(--amber)">Trung bình cao</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">AI Alerts hôm nay</div>
+          <div class="stat-value">3</div>
+          <div class="stat-change" style="color:var(--purple)">2 mua · 1 cảnh báo</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Hiệu suất danh mục</div>
+          <div class="chart-sub">So sánh với VN-INDEX (YTD)</div>
+          <div class="chart-area">
+            <canvas id="perfChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Phân bổ tài sản</div>
+          <div class="chart-sub">Cơ cấu hiện tại</div>
+          <div class="donut-wrap">
+            <canvas id="donutChart" class="donut-canvas"></canvas>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#00D4FF"></div><span class="legend-name">Cổ phiếu</span><span
+                  class="legend-val">40%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#00E5A0"></div><span class="legend-name">ETF</span><span
+                  class="legend-val">25%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#7C5CFC"></div><span class="legend-name">Trái
+                  phiếu</span><span class="legend-val">20%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#FFB800"></div><span class="legend-name">Tiền mặt</span><span
+                  class="legend-val">10%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#FF4B6B"></div><span class="legend-name">Khác</span><span
+                  class="legend-val">5%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="chart-title">Vị thế hiện tại</div>
+            <div class="chart-sub">Top cổ phiếu trong danh mục</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Mã CK</th>
+              <th>Tên công ty</th>
+              <th>Khối lượng</th>
+              <th>Giá hiện tại</th>
+              <th>Thay đổi</th>
+              <th>Giá trị</th>
+              <th>Tỷ trọng</th>
+              <th>AI gợi ý</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="ticker">FPT</td>
+              <td>FPT Corporation</td>
+              <td>1,200</td>
+              <td>128,500đ</td>
+              <td style="color:var(--green)">▲ +2.1%</td>
+              <td>154,200,000đ</td>
+              <td>30%</td>
+              <td><span class="badge buy">MUA</span></td>
+            </tr>
+            <tr>
+              <td class="ticker">HPG</td>
+              <td>Hòa Phát Group</td>
+              <td>2,000</td>
+              <td>38,200đ</td>
+              <td style="color:var(--red)">▼ -0.8%</td>
+              <td>76,400,000đ</td>
+              <td>15%</td>
+              <td><span class="badge hold">GIỮ</span></td>
+            </tr>
+            <tr>
+              <td class="ticker">MWG</td>
+              <td>Thế Giới Di Động</td>
+              <td>500</td>
+              <td>62,400đ</td>
+              <td style="color:var(--green)">▲ +1.5%</td>
+              <td>31,200,000đ</td>
+              <td>12%</td>
+              <td><span class="badge buy">MUA</span></td>
+            </tr>
+            <tr>
+              <td class="ticker">VNM</td>
+              <td>Vinamilk</td>
+              <td>800</td>
+              <td>78,100đ</td>
+              <td style="color:var(--red)">▼ -0.3%</td>
+              <td>62,480,000đ</td>
+              <td>10%</td>
+              <td><span class="badge hold">GIỮ</span></td>
+            </tr>
+            <tr>
+              <td class="ticker">MSN</td>
+              <td>Masan Group</td>
+              <td>300</td>
+              <td>84,500đ</td>
+              <td style="color:var(--red)">▼ -1.2%</td>
+              <td>25,350,000đ</td>
+              <td>8%</td>
+              <td><span class="badge sell">BÁN</span></td>
+            </tr>
+            <tr>
+              <td class="ticker">VN30F</td>
+              <td>ETF VN30</td>
+              <td>5,000</td>
+              <td>14,200đ</td>
+              <td style="color:var(--green)">▲ +0.5%</td>
+              <td>71,000,000đ</td>
+              <td>25%</td>
+              <td><span class="badge hold">GIỮ</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== AI ADVISOR ===== -->
+    <div class="page" id="page-advisor">
+      <div class="page-header">
+        <div>
+          <div class="page-title">AI Advisor</div>
+          <div class="page-sub">Trợ lý tài chính AI hoạt động 24/7</div>
+        </div>
+        <div class="header-badge">
+          <div class="live-dot"></div>AI đang trực tuyến
+        </div>
+      </div>
+
+      <div class="chat-layout">
+        <div class="chat-main">
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg">
+              <div class="msg-avatar ai">🤖</div>
+              <div>
+                <div class="msg-body">Xin chào! Tôi là AI Finvest Advisor — trợ lý đầu tư thông minh của bạn.
+                  📊<br><br>Tôi có thể giúp bạn:<br>• Phân tích cổ phiếu và đề xuất danh mục<br>• Đánh giá rủi ro đầu
+                  tư<br>• Giải thích chỉ số tài chính<br>• Dự báo xu hướng thị trường<br><br>Bạn muốn hỏi gì hôm nay?
+                </div>
+                <div class="msg-time">09:41 · AI Finvest</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="quick-chips">
+              <div class="chip" onclick="sendQuick('Phân tích cổ phiếu FPT cho tôi')">📈 Phân tích FPT</div>
+              <div class="chip" onclick="sendQuick('Danh mục của tôi có nên tái cơ cấu không?')">🔄 Tái cơ cấu DM</div>
+              <div class="chip" onclick="sendQuick('VN-INDEX tuần này như thế nào?')">📊 Xu hướng VN-INDEX</div>
+              <div class="chip" onclick="sendQuick('Giải thích chỉ số P/E cho tôi')">📚 Giải thích P/E</div>
+            </div>
+            <div class="input-row">
+              <textarea class="chat-input" id="chatInput" placeholder="Hỏi AI về cổ phiếu, danh mục, thị trường..."
+                rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+              <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-sidebar">
+          <div class="info-card">
+            <div class="info-title">🛡️ Risk Score của bạn</div>
+            <div class="risk-score">6.2 / 10</div>
+            <div class="risk-label" style="font-size:12px;color:var(--amber);margin-bottom:8px">Trung bình cao</div>
+            <div class="risk-bar">
+              <div class="risk-fill" style="width:62%"></div>
+            </div>
+            <div class="risk-labels"><span>An toàn</span><span>Cân bằng</span><span>Tăng trưởng</span></div>
+          </div>
+          <div class="info-card">
+            <div class="info-title">💰 Phân bổ đề xuất</div>
+            <div class="alloc-row"><span class="alloc-name">Cổ phiếu VN</span><span class="alloc-val">40%</span></div>
+            <div class="alloc-row"><span class="alloc-name">ETF</span><span class="alloc-val">25%</span></div>
+            <div class="alloc-row"><span class="alloc-name">Trái phiếu</span><span class="alloc-val">20%</span></div>
+            <div class="alloc-row"><span class="alloc-name">Tiền mặt</span><span class="alloc-val">10%</span></div>
+            <div class="alloc-row"><span class="alloc-name">Khác</span><span class="alloc-val">5%</span></div>
+          </div>
+          <div class="info-card">
+            <div class="info-title">⚡ Gợi ý hôm nay</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div
+                style="padding:10px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:8px">
+                <div style="font-size:12px;font-weight:700;color:var(--green)">▲ MUA · FPT</div>
+                <div style="font-size:11px;color:var(--text2);margin-top:3px">Q2 +24% — tăng tỷ trọng</div>
+              </div>
+              <div
+                style="padding:10px;background:rgba(255,75,107,0.08);border:1px solid rgba(255,75,107,0.2);border-radius:8px">
+                <div style="font-size:12px;font-weight:700;color:var(--red)">▼ XEM XÉT BÁN · MSN</div>
+                <div style="font-size:11px;color:var(--text2);margin-top:3px">Xu hướng giảm ngắn hạn</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RISK ASSESSMENT ===== -->
+    <div class="page" id="page-assess">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Đánh giá rủi ro cá nhân</div>
+          <div class="page-sub">AI phân tích khẩu vị rủi ro và đề xuất danh mục phù hợp</div>
+        </div>
+      </div>
+
+      <div class="assess-grid">
+        <div class="assess-card">
+          <div class="chart-title" style="margin-bottom:20px">📋 Thông tin đầu tư</div>
+
+          <div class="form-group">
+            <label>Tuổi của bạn</label>
+            <select id="ageRange">
+              <option value="18-25">18–25 tuổi</option>
+              <option value="26-35" selected>26–35 tuổi</option>
+              <option value="36-45">36–45 tuổi</option>
+              <option value="46-55">46–55 tuổi</option>
+              <option value="55+">Trên 55 tuổi</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Vốn đầu tư hiện có</label>
+            <select id="capital">
+              <option value="under50">Dưới 50 triệu</option>
+              <option value="50-200" selected>50–200 triệu</option>
+              <option value="200-500">200–500 triệu</option>
+              <option value="500-1b">500 triệu – 1 tỷ</option>
+              <option value="over1b">Trên 1 tỷ</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Thời gian đầu tư</label>
+            <select id="timeHorizon">
+              <option value="1">Dưới 1 năm</option>
+              <option value="1-3">1–3 năm</option>
+              <option value="3-5" selected>3–5 năm</option>
+              <option value="5-10">5–10 năm</option>
+              <option value="10+">Trên 10 năm</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Kinh nghiệm đầu tư</label>
+            <select id="experience">
+              <option value="none">Chưa có kinh nghiệm (F0)</option>
+              <option value="beginner" selected>Mới bắt đầu (1-2 năm)</option>
+              <option value="intermediate">Trung cấp (3-5 năm)</option>
+              <option value="advanced">Chuyên nghiệp (5+ năm)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Mức độ chấp nhận thua lỗ tối đa: <span id="lossLabel" style="color:var(--cyan)">15%</span></label>
+            <div class="slider-wrap">
+              <span style="font-size:12px;color:var(--text3)">5%</span>
+              <input type="range" min="5" max="50" value="15" step="5" id="lossSlider"
+                oninput="document.getElementById('lossLabel').textContent=this.value+'%'">
+              <span style="font-size:12px;color:var(--text3)">50%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Mục tiêu đầu tư</label>
+            <select id="goal">
+              <option value="preserve">Bảo toàn vốn</option>
+              <option value="income">Thu nhập ổn định</option>
+              <option value="balanced" selected>Cân bằng tăng trưởng</option>
+              <option value="growth">Tăng trưởng mạnh</option>
+              <option value="aggressive">Tối đa hoá lợi nhuận</option>
+            </select>
+          </div>
+
+          <button class="primary-btn" onclick="runAssessment()">🤖 Phân tích bằng AI →</button>
+        </div>
+
+        <div class="assess-card">
+          <div class="chart-title" style="margin-bottom:20px">📊 Kết quả phân tích AI</div>
+          <div id="assessPlaceholder" style="text-align:center;padding:60px 0;color:var(--text3)">
+            <div style="font-size:40px;margin-bottom:12px">🔍</div>
+            <div>Điền thông tin và nhấn phân tích<br>để nhận gợi ý danh mục cá nhân</div>
+          </div>
+          <div class="result-box" id="assessResult">
+            <div id="resultScoreDisplay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ALERTS ===== -->
+    <div class="page" id="page-alerts">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Cảnh báo & Gợi ý</div>
+          <div class="page-sub">Thông báo tự động từ AI — cập nhật real-time</div>
+        </div>
+        <div class="header-badge">
+          <div class="live-dot"></div>3 cảnh báo mới
+        </div>
+      </div>
+
+      <div class="alerts-list" id="alertsList">
+        <div class="alert-item">
+          <div class="alert-icon buy">📈</div>
+          <div class="alert-content">
+            <div class="alert-title">FPT — Tín hiệu MUA mạnh</div>
+            <div class="alert-desc">AI phát hiện xu hướng tăng sau báo cáo Q2 vượt kỳ vọng 24%. EPS đạt 4,250đ, ROE
+              18.6%. Khuyến nghị tăng tỷ trọng lên 35%.</div>
+            <div class="alert-time">🕐 09:30 · Hôm nay · Độ tin cậy 87%</div>
+          </div>
+          <div class="alert-action">
+            <span class="badge buy">MUA</span>
+            <button class="dismiss-btn" onclick="dismissAlert(this)">Bỏ qua</button>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon sell">📉</div>
+          <div class="alert-content">
+            <div class="alert-title">MSN — Cảnh báo rủi ro</div>
+            <div class="alert-desc">Sentiment tiêu cực tăng mạnh trên mạng xã hội. Dữ liệu macro ngành tiêu dùng yếu. AI
+              khuyến nghị xem xét cắt giảm vị thế.</div>
+            <div class="alert-time">🕐 08:45 · Hôm nay · Độ tin cậy 74%</div>
+          </div>
+          <div class="alert-action">
+            <span class="badge sell">CẢNH BÁO</span>
+            <button class="dismiss-btn" onclick="dismissAlert(this)">Bỏ qua</button>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon warn">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">Danh mục — Cần tái cơ cấu</div>
+            <div class="alert-desc">Tỷ trọng cổ phiếu công nghệ đang chiếm 42%, vượt ngưỡng an toàn 35% theo khẩu vị rủi
+              ro của bạn. Nên phân bổ lại sang ETF hoặc trái phiếu.</div>
+            <div class="alert-time">🕐 08:00 · Hôm nay · Tự động</div>
+          </div>
+          <div class="alert-action">
+            <span class="badge hold">TÁI CƠ CẤU</span>
+            <button class="dismiss-btn" onclick="dismissAlert(this)">Bỏ qua</button>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon info">📰</div>
+          <div class="alert-content">
+            <div class="alert-title">VN-INDEX — Phân tích thị trường hàng tuần</div>
+            <div class="alert-desc">VN-INDEX tăng 0.85% tuần qua, thanh khoản cải thiện. Khối ngoại mua ròng 320 tỷ
+              đồng. Xu hướng ngắn hạn tích cực, hỗ trợ 1,250 điểm.</div>
+            <div class="alert-time">🕐 Thứ 2 · 09:00 · Báo cáo tuần</div>
+          </div>
+          <div class="alert-action">
+            <span class="badge hold" style="background:rgba(124,92,252,0.15);color:var(--purple)">TIN TỨC</span>
+            <button class="dismiss-btn" onclick="dismissAlert(this)">Bỏ qua</button>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon buy">💡</div>
+          <div class="alert-content">
+            <div class="alert-title">MWG — Cơ hội mua vào</div>
+            <div class="alert-desc">Sau đợt điều chỉnh 8%, MWG đang tiệm cận vùng hỗ trợ kỹ thuật 60,000đ. Báo cáo bán
+              lẻ Q2 tích cực. AI đánh giá upside 15-20% trong 6 tháng.</div>
+            <div class="alert-time">🕐 Hôm qua · 15:30 · Độ tin cậy 81%</div>
+          </div>
+          <div class="alert-action">
+            <span class="badge buy">CƠ HỘI</span>
+            <button class="dismiss-btn" onclick="dismissAlert(this)">Bỏ qua</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PORTFOLIO ===== -->
+    <div class="page" id="page-portfolio">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Danh mục chi tiết</div>
+          <div class="page-sub">Phân tích Markowitz — tối ưu hóa lợi nhuận/rủi ro</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:24px">
+        <div class="stat-card cyan">
+          <div class="stat-label">Lợi nhuận kỳ vọng</div>
+          <div class="stat-value">18.6%</div>
+          <div class="stat-change up">▲ Cao hơn VN-INDEX 9.9%</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Sharpe Ratio</div>
+          <div class="stat-value">1.42</div>
+          <div class="stat-change up">▲ Rất tốt (> 1.0)</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Volatility (σ)</div>
+          <div class="stat-value">12.3%</div>
+          <div class="stat-change" style="color:var(--amber)">Trung bình thấp</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Max Drawdown</div>
+          <div class="stat-value">-8.7%</div>
+          <div class="stat-change" style="color:var(--purple)">Kiểm soát tốt</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Efficient Frontier</div>
+          <div class="chart-sub">Danh mục tối ưu Markowitz</div>
+          <div class="chart-area">
+            <canvas id="frontierChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Phân bổ tối ưu AI</div>
+          <div class="chart-sub">Dựa theo khẩu vị rủi ro 6.2/10</div>
+          <div style="margin-top:16px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span
+                    style="color:var(--text2)">FPT</span><span
+                    style="color:var(--cyan);font-weight:600;font-family:var(--mono)">30%</span></div>
+                <div style="height:6px;background:var(--bg);border-radius:3px">
+                  <div style="width:30%;height:100%;background:var(--cyan);border-radius:3px"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span
+                    style="color:var(--text2)">ETF VN30</span><span
+                    style="color:var(--green);font-weight:600;font-family:var(--mono)">25%</span></div>
+                <div style="height:6px;background:var(--bg);border-radius:3px">
+                  <div style="width:25%;height:100%;background:var(--green);border-radius:3px"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span
+                    style="color:var(--text2)">Trái phiếu</span><span
+                    style="color:var(--purple);font-weight:600;font-family:var(--mono)">20%</span></div>
+                <div style="height:6px;background:var(--bg);border-radius:3px">
+                  <div style="width:20%;height:100%;background:var(--purple);border-radius:3px"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span
+                    style="color:var(--text2)">HPG</span><span
+                    style="color:var(--amber);font-weight:600;font-family:var(--mono)">15%</span></div>
+                <div style="height:6px;background:var(--bg);border-radius:3px">
+                  <div style="width:15%;height:100%;background:var(--amber);border-radius:3px"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span
+                    style="color:var(--text2)">Tiền mặt & Khác</span><span
+                    style="color:var(--text2);font-weight:600;font-family:var(--mono)">10%</span></div>
+                <div style="height:6px;background:var(--bg);border-radius:3px">
+                  <div style="width:10%;height:100%;background:var(--text3);border-radius:3px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+
+
+  <script src="script.js">
+
+  </script>
+</body>
+
+</html>
