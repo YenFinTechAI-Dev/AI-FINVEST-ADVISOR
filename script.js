@@ -83,7 +83,7 @@ async function loadDashboard() {
         renderHistory(data.history || []);
         return data;
     } catch (e) {
-        console.warn("Backend 8000 chưa kết nối:", e.message);
+        console.warn("Backend chưa kết nối:", e.message);
         renderChart(null, null);
         renderHistory([]);
         return null;
@@ -92,7 +92,6 @@ async function loadDashboard() {
 
 /* ── Xóa giao dịch ── */
 async function deleteTransaction(id) {
-    console.log("🗑️ Xóa id:", id);
     const el = document.getElementById(`tx-${id}`);
     try {
         if (el) {
@@ -101,17 +100,14 @@ async function deleteTransaction(id) {
             el.style.transform = 'translateX(20px)';
         }
         const res = await fetch(`${API_URL}/transactions/${id}`, { method: 'DELETE' });
-        console.log("📡 Status:", res.status);
-        const json = await res.json().catch(() => ({}));
-        console.log("📦 Body:", json);
         if (!res.ok) {
+            const json = await res.json().catch(() => ({}));
             alert(`Lỗi xóa: ${json.detail || res.status}`);
             if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
             return;
         }
         setTimeout(async () => { await loadDashboard(); }, 260);
     } catch (err) {
-        console.error("❌ Lỗi:", err.message);
         alert("Lỗi kết nối: " + err.message);
         if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
         await loadDashboard();
@@ -138,32 +134,63 @@ function renderHistory(history) {
     };
 
     el.innerHTML = history.map(tx => {
-        // Thu = Mua vào (bỏ tiền ra), Chi = Bán ra (thu tiền về)
-        const isBuy = tx.type === 'Thu';
-        const cls = isBuy ? 'chi' : 'thu';
-        const sign = isBuy ? '-' : '+';
-        const label = isBuy ? 'Mua vào' : 'Bán ra';
+
+        // Nếu là MuaVao => hiện Mua
+        // Nếu là BanRa  => hiện Bán
+        const type = String(tx.type).trim();
+
+        const isBuy = type === 'MuaVao';
+
+        const cls = isBuy ? 'thu' : 'chi';
+        const sign = isBuy ? '+' : '-';
+        const label = isBuy ? 'Mua' : 'Bán';
+
         const icon = catIcons[tx.category] || '📊';
-        const date = tx.date ? new Date(tx.date).toLocaleDateString('vi-VN') : '';
+
+        const date = tx.date
+            ? new Date(tx.date).toLocaleDateString('vi-VN')
+            : '';
 
         return `
         <div class="history-item fade-in" id="tx-${tx.id}">
-            <div class="history-icon-wrap ${cls}">${icon}</div>
+
+            <div class="history-icon-wrap ${cls}">
+                ${icon}
+            </div>
+
             <div class="history-info">
                 <div class="history-cat">
                     ${tx.category}
-                    <span style="font-size:11px; opacity:0.6;">${label}</span>
+
+                    <span style="
+                        font-size:11px;
+                        opacity:0.7;
+                        margin-left:6px;
+                    ">
+                        ${label}
+                    </span>
                 </div>
-                <div class="history-note">${tx.note || date}</div>
+
+                <div class="history-note">
+                    ${tx.note || date}
+                </div>
             </div>
-            <div class="history-amount ${cls}">${sign}${Number(tx.amount).toLocaleString('vi-VN')}đ</div>
-            <button class="btn-delete-tx" onclick="deleteTransaction(${tx.id})" title="Xóa">
+
+            <div class="history-amount ${cls}">
+                ${sign}${Number(tx.amount).toLocaleString('vi-VN')}đ
+            </div>
+
+            <button
+                class="btn-delete-tx"
+                onclick="deleteTransaction(${tx.id})"
+                title="Xóa"
+            >
                 <i class="fa-solid fa-trash-can"></i>
             </button>
+
         </div>`;
     }).join('');
 }
-
 function renderMarkdown(text) {
     if (!text) return '';
     return text
@@ -192,12 +219,12 @@ async function processAI() {
         </div></div>`;
 
     const dashData = await loadDashboard();
-    let context = "Danh mục mặc định: Cổ phiếu 40%, ETF 25%, Trái phiếu 20%, Tiền mặt 10%, Khác 5%. Tổng giá trị: 127.5M đ. Lợi nhuận YTD: +18.4%. Risk Score: 6.2/10 (Trung bình cao).";
+    let context = "Danh mục mặc định: Cổ phiếu 40%, ETF 25%, Trái phiếu 20%, Tiền mặt 10%, Khác 5%.";
     if (dashData) {
         const { summary, chart, history } = dashData;
         const topCats = (chart && chart.labels || []).map((l, i) => `${l}: ${(chart.values[i] || 0).toLocaleString('vi-VN')}đ`).join(', ');
-        const recentTx = (history || []).slice(0, 5).map(t => `${t.type === 'Thu' ? 'Mua vào' : 'Bán ra'} ${t.category} ${t.amount.toLocaleString('vi-VN')}đ`).join('; ');
-        context = `Danh mục đầu tư AI-FINVEST: Tổng giá trị 127.5M đ | Lợi nhuận YTD: +18.4% | Risk Score: 6.2/10 (Trung bình cao). Phân bổ tối ưu Markowitz: Cổ phiếu 40%, ETF 25%, Trái phiếu 20%, Tiền mặt 10%, Khác 5%. Mua vào: ${(summary.total_income || 0).toLocaleString('vi-VN')}đ | Bán ra: ${(summary.total_expense || 0).toLocaleString('vi-VN')}đ. Chi tiết: ${topCats || 'Chưa có'}. Giao dịch gần đây: ${recentTx || 'Chưa có'}.`;
+        const recentTx = (history || []).slice(0, 5).map(t => `${t.type === 'MuaVao' ? 'Mua vào' : 'Bán ra'} ${t.category} ${t.amount.toLocaleString('vi-VN')}đ`).join('; ');
+        context = `Danh mục AI-FINVEST: Tổng 127.5M đ | YTD: +18.4% | Risk: 6.2/10. Mua vào: ${(summary.total_income || 0).toLocaleString('vi-VN')}đ | Bán ra: ${(summary.total_expense || 0).toLocaleString('vi-VN')}đ. Chi tiết: ${topCats || 'Chưa có'}. Gần đây: ${recentTx || 'Chưa có'}.`;
     }
 
     try {
@@ -216,15 +243,14 @@ async function processAI() {
                     body: JSON.stringify(result)
                 });
                 await loadDashboard();
-                const color = result.type === 'Thu' ? 'var(--red)' : 'var(--green)';
-                const label = result.type === 'Thu' ? 'Mua vào' : 'Bán ra';
+                const isBuy = result.type === 'MuaVao';
+                const color = isBuy ? 'var(--green)' : 'var(--red)';
+                const label = isBuy ? 'Mua vào' : 'Bán ra';
                 status.innerHTML = `<div class="ai-status-box success">
-                    <div class="ai-result-row">
-                        <div>
-                            <div class="ai-result-main">✅ Đã ghi ${label} <strong style="color:${color}">${result.amount.toLocaleString('vi-VN')}đ</strong> — <strong>${result.category}</strong></div>
-                            <div class="ai-result-note">${result.note}</div>
-                        </div>
-                    </div></div>`;
+                    <div class="ai-result-row"><div>
+                        <div class="ai-result-main">✅ Đã ghi ${label} <strong style="color:${color}">${result.amount.toLocaleString('vi-VN')}đ</strong> — <strong>${result.category}</strong></div>
+                        <div class="ai-result-note">${result.note}</div>
+                    </div></div></div>`;
             } else {
                 status.innerHTML = `<div class="ai-status-box analysis">
                     <div class="ai-analysis-header">📊 Phân tích AI – Danh mục đầu tư của bạn</div>
@@ -237,7 +263,7 @@ async function processAI() {
         }
     } catch (err) {
         status.innerHTML = `<div class="ai-status-box error">
-            <strong>Lỗi kết nối AI Server:</strong> Hãy đảm bảo backend AI đang chạy tại port 8001.<br>
+            <strong>Lỗi kết nối AI:</strong> Đảm bảo backend AI chạy tại port 8001.<br>
             <small style="opacity:0.7;">${err.message}</small></div>`;
     }
     btn.disabled = false;
@@ -248,7 +274,7 @@ document.getElementById('transactionForm').addEventListener('submit', async (e) 
     e.preventDefault();
     const payload = {
         amount: parseInt(document.getElementById('amount').value),
-        type: document.getElementById('type').value,
+        type: document.getElementById('type').value,      // "MuaVao" hoặc "BanRa"
         category: document.getElementById('category').value,
         note: document.getElementById('note').value
     };

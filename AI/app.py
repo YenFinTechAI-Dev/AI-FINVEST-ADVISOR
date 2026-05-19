@@ -17,7 +17,7 @@ app.add_middleware(
 
 llm = ChatOllama(model="qwen2.5:3b", format="json", temperature=0.3)
 
-# ─── SYSTEM PROMPT — Train AI theo bố cục PDF AI-FINVEST ADVISOR ───
+
 SYSTEM_PROMPT = """Bạn là AI-FINVEST Advisor — Chuyên gia Robo-Advisor tối ưu hóa danh mục đầu tư cá nhân bằng AI.
 Slogan: "From Data To Decision — AI-Powered Investing For Everyone"
 Bạn hoạt động 24/7, không thay thế nhà đầu tư mà giúp họ đầu tư thông minh hơn.
