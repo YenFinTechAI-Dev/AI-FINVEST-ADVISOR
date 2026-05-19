@@ -6,7 +6,7 @@ from datetime import datetime
 import uvicorn
 
 
-app = FastAPI(title="Hệ thống Quản lý Tài chính - Backend")
+app = FastAPI(title="AI-FINVEST-ADVISOR")
 
 
 app.add_middleware(
@@ -17,7 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- CẤU TRÚC DỮ LIỆU (SCHEMA) ---
 
 class Transaction(BaseModel):
     amount: int
@@ -53,7 +52,7 @@ init_db()
 
 @app.get("/")
 def home():
-    return {"status": "online", "message": "Backend Quản lý chi tiêu đang hoạt động!"}
+    return {"message": "API Running"}
 
 @app.post("/api/transactions")
 async def add_transaction(item: Transaction):
